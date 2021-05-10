@@ -1,6 +1,7 @@
 const User = require('../models/user.model');
 
 const bcrypt = require('bcryptjs');
+const shortid = require('shortid');
 const jwt = require('jsonwebtoken');
 
 
@@ -182,19 +183,32 @@ module.exports.login = (req, res, next) => {
                             message: 'Auth failed.'
                         })
                     }
+                    const newSessionToken = shortid.generate();
                     if (result) {
-                        const token = jwt.sign({
-                                email: users[0].email,
-                                userId: users[0]._id
-                            },
-                            process.env.JWT_KEY, {
-                                expiresIn: "1h"
-                            },
-                        );
-                        return res.status(200).json({
-                            message: 'Auth successfuly.',
-                            token: token
-                        })
+                        User.updateOne({ email: users[0].email }, {
+                                sessionToken: newSessionToken
+                            }).exec()
+                            .then(modidy => {
+                                const token = jwt.sign({
+                                        email: users[0].email,
+                                        userId: users[0]._id,
+                                        sessionToken: newSessionToken,
+                                    },
+                                    process.env.JWT_KEY, {
+                                        expiresIn: "4h"
+                                    },
+                                );
+                                return res.status(200).json({
+                                    message: 'Auth successfuly.',
+                                    token: token
+                                })
+                            })
+                            .catch(error => {
+                                res.status(401).json({
+                                    message: "Auth Failed."
+                                })
+                            })
+
                     }
                 })
             } else {

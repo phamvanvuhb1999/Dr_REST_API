@@ -7,7 +7,10 @@ const userSchema = mongoose.Schema({
         require: true,
         unique: true,
         match: /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/,
-    }
+    },
+    sessionToken: { type: String, default: null },
+    isStaff: { type: Boolean, default: false },
+    isAdmin: { type: Boolean, default: false },
 })
 
 
