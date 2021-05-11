@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router();
 
+const mongoose = require('mongoose');
+
 //const commentController = require('../controllers/controller.comments');
 const User = require('../models/user.model');
 const Comment = require('../models/comment.model');
@@ -9,14 +11,14 @@ const Profile = require('../models/profile.model');
 const Conversation = require('../models/conversation.model');
 
 const tokenMiddleware = require('../middlewares/check.token');
-const permitionMiddleware = require('../middlewares/check.permition.admin');
+const permissionMiddleware = require('../middlewares/check.permission.admin');
 
 const RES = require('./response');
 
 
 
 //get all conversations 
-router.get('/', function(req, res, next) {
+router.get('/', tokenMiddleware, function(req, res, next) {
     const profileId = req.params.profileId;
     const user_data = req.userData;
     Conversation.find({})
@@ -34,7 +36,7 @@ router.get('/', function(req, res, next) {
 });
 
 //get all conversation from specific profile
-router.get('/:profileId', function(req, res, next) {
+router.get('/:profileId', tokenMiddleware, function(req, res, next) {
     const profileId = req.params.profileId;
     const user_data = req.userData;
     Profile.findOne({ userId: user_data.userId })
@@ -54,7 +56,7 @@ router.get('/:profileId', function(req, res, next) {
                         return RES.resMessage(res, erro, 500);
                     })
             } else {
-                return RES.responseNoPermition(res, "No permition to get all conversation from orther user profile.");
+                return RES.responseNoPermission(res, "No permission to get all conversation from orther user profile.");
             }
         })
         .catch(error => {
@@ -77,70 +79,99 @@ router.get('/:conversationId', tokenMiddleware, function(req, res, next) {
 
 //create conversation
 router.post('/', tokenMiddleware, function(req, res, next) {
-    let user = req.userData;
-    let conversation_id = req.body.conversation_id;
-    let content = req.body.content;
-    let attached = req.body.attached;
+    const user_data = req.userData;
+    const form = req.body;
 
-    Conversation.findOne({ _id: conversation_id })
+    Profile.findOne({ userId: user_data.userId })
         .exec()
-        .then(conversation => {
-            if (conversation) {
-                const comment = Comment({
-                    author_id: user.userId,
-                    conversation_id: conversation_id,
-                    content: content,
-                    attached: attached,
-                });
-                comment.save()
-                    .then(result => {
-                        console.log(result);
-                        return RES.responseNormal(res, result, "Comment was Created.");
-                    })
-                    .catch(erro => {
-                        return RES.resMessage(res, erro, 500);
-                    })
+        .then(profile => {
+            console.log(profile);
+            const newConversation = {};
+            newConversation.author_id = profile._id;
+            if (form.name) {
+                newConversation.name = " " + form.name;
             } else {
-                return RES.responseDataEmpty(res, "Conversation id invalid.");
+                newConversation.name = profile.fullname + "";
             }
-        })
-        .catch(error => {
-            return RES.resMessage(res, error, 500);
-        })
 
-});
+            if (form.member_ids.length > 0) {
+                newConversation.member_ids = form.member_ids.map(x =>
+                    mongoose.Types.ObjectId(x)
+                )
+            }
 
-//udpate conversation
-router.patch('/:commentId', tokenMiddleware, function(req, res, next) {
-    const user = req.userData;
-    const commentId = req.params.commentId;
-    const newComment = {};
-    if (req.body.content) {
-        newComment.content = req.body.content;
-    }
-    if (req.body.attached) {
-        newComment.attached = req.body.attached;
-    }
+            newConversation.member_ids.push(profile._id);
 
-    Comment.findOne({ _id: commentId })
-        .exec()
-        .then(comment => {
-            if (comment) {
-                if (user.userId == comment.author_id) {
-                    Comment.updateOne({ _id: commentId }, { $set: newComment })
+            const conversation = new Conversation(newConversation)
+            conversation.save()
+                .then(result => {
+                    Profile.updateMany({
+                            _id: { $in: newConversation.member_ids }
+                        }, {
+                            $push: { "conversation_ids": result._id }
+                        })
                         .exec()
-                        .then(result => {
-                            return RES.responseNormal(res, result, "Comment was Updated.");
+                        .then(result1 => {
+                            return RES.responseNormal(res, result, "Conversation was created and Profiles was modify.");
                         })
                         .catch(erro => {
                             return RES.resMessage(res, erro, 500);
                         })
-                } else {
-                    return RES.responseNoPermition(res, "Not the commit's author");
-                }
-            } else {
-                return RES.responseDataEmpty(res, "No comment with Id.");
+                })
+                .catch(error => {
+                    return RES.resMessage(res, error, 500);
+                })
+        })
+        .catch(error => {
+            return RES.resMessage(res, error, 500);
+        })
+});
+
+//update conversation
+router.patch('/:conversationId', tokenMiddleware, function(req, res, next) {
+    const id = req.params.conversationId;
+    const form = req.body;
+    const user_data = req.userData;
+
+    Conversation.findOne({ _id: id })
+        .exec()
+        .then(conversation => {
+            let removed = [];
+            let added = [];
+            if (form.name.trim() != "") {
+                conversation.name = form.name.trim();
             }
+            if (form.member_ids) {
+                if (form.member_ids.length > 0) {
+                    for (item in form.member_ids) {
+                        let index = conversation.member_ids.indexOf(item);
+                        if (index >= 0) {
+                            remove.push(conversation.member_ids.splice(index, 1));
+                        } else {
+                            conversation.menber_ids.push(mongoose.Types.ObjectId(item));
+                            added.push(mongoose.Types.ObjectId(item));
+                        }
+                    }
+                }
+            }
+            conversation.save()
+                .then(result => {
+                    Profile.updateMany({
+                            _id: { $in: added }
+                        }, {
+                            $push: { "conversation_ids": result._id }
+                        })
+                        .exec()
+                        .then(result1 => {
+                            return RES.responseNormal(res, result, "Conversation was Updated.");
+                        })
+                        .catch(err => {
+                            return RES.resMessage(res, err, 500);
+                        })
+                })
+                .catch(erro => {
+                    return RES.resMessage(res, erro, 500);
+                })
         })
         .catch(error => {
             return RES.resMessage(res, error, 500);
@@ -148,32 +179,8 @@ router.patch('/:commentId', tokenMiddleware, function(req, res, next) {
 });
 
 //delete conversation
-router.delete('/:commentId', tokenMiddleware, function(req, res, next) {
-    const user = req.userData;
+router.delete('/:conversationId', tokenMiddleware, function(req, res, next) {
 
-    Comment.findOne({ _id: commentId })
-        .exec()
-        .then(comment => {
-            if (comment) {
-                if (user.userId == comment.author_id) {
-                    Comment.deleteOne({ _id: commentId })
-                        .exec()
-                        .then(result => {
-                            return RES.responseNormal(res, result, "Comment was Deleted.");
-                        })
-                        .catch(erro => {
-                            return RES.resMessage(res, erro, 500);
-                        })
-                } else {
-                    return RES.responseNoPermition(res, "Not the comment's author");
-                }
-            } else {
-                return RES.responseDataEmpty(res, "No comment with Id.");
-            }
-        })
-        .catch(error => {
-            return RES.resMessage(res, error, 500);
-        })
 });
 
 

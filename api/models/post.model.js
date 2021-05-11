@@ -2,11 +2,11 @@ const mongoose = require('mongoose')
 const postSchema = mongoose.Schema({
     author_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'Profile',
         require: true
     },
     creat_at: { type: Date, default: Date.now },
-    content: { type: String, require: false },
+    content: { type: String, default: "" },
     attached: {
         type: String,
         require: false

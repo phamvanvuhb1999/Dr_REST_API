@@ -14,9 +14,9 @@ const ProfileSchema = mongoose.Schema({
     friends: {
         type: [{
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Profile',
-            validate: [maxFriendList, "{PATH} max friends in listFriend"],
+            ref: 'Profile'
         }],
+        validate: [maxFriendList]
     },
     conversation_ids: {
         type: [{
@@ -26,8 +26,8 @@ const ProfileSchema = mongoose.Schema({
     }
 })
 
-function maxFriendList(listFriend) {
-    return listFriend.length < 5000;
+function maxFriendList(value) {
+    return value.length < 5000;
 }
 
 

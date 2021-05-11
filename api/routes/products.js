@@ -4,7 +4,7 @@ const router = express.Router();
 const productController = require('../controllers/controller.products');
 
 const checkAuth = require('../middlewares/check.token');
-const checkPermition = require('../middlewares/check.permition.admin');
+const checkPermission = require('../middlewares/check.permission.admin');
 
 const multer = require('multer');
 

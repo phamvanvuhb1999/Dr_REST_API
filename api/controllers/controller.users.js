@@ -3,6 +3,7 @@ const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 const shortid = require('shortid');
 const jwt = require('jsonwebtoken');
+const Profile = require('../models/profile.model');
 
 
 module.exports.getAllUser = (req, res, next) => {
@@ -150,9 +151,26 @@ module.exports.signup = (req, res, next) => {
 
                         user.save()
                             .then(result => {
-                                res.status(201).json({
-                                    message: 'User Created'
+                                const profile = new Profile({
+                                    fullname: email.split("@")[0],
+                                    userId: user._id,
+                                    friends: [],
+                                    conversation_ids: [],
                                 })
+
+                                profile.save()
+                                    .then(result1 => {
+                                        res.status(201).json({
+                                            message: "User and Profile were created.",
+                                            user: result,
+                                            profile: result1,
+                                        })
+                                    })
+                                    .catch(erro => {
+                                        res.status(500).json({
+                                            error: erro,
+                                        })
+                                    })
                             })
                             .catch(error => {
                                 console.log(error);

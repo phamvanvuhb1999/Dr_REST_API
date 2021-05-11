@@ -7,11 +7,13 @@ const User = require('../models/user.model');
 
 const RES = require('./response');
 
+const tokerMiddleware = require('../middlewares/check.token');
+
 //const postController = require('../controllers/controller.posts');
 
 
 //get all posts
-router.get('/', function(req, res, next) {
+router.get('/', tokerMiddleware, function(req, res, next) {
 
     //update permittions here
 
@@ -31,7 +33,7 @@ router.get('/', function(req, res, next) {
 });
 
 //get single post
-router.get('/:postId', function(req, res, next) {
+router.get('/:postId', tokerMiddleware, function(req, res, next) {
     const postId = req.params.postId;
     Post.find({ _id: postId })
         .exec()
@@ -44,7 +46,7 @@ router.get('/:postId', function(req, res, next) {
 });
 
 //get all post from specific user
-router.get('/:profileId', function(req, res, next) {
+router.get('/:profileId', tokerMiddleware, function(req, res, next) {
     const profileId = req.params.profileId;
     const user_data = req.userData;
     Profile.findOne({ _id: profileId })
@@ -64,7 +66,7 @@ router.get('/:profileId', function(req, res, next) {
                         return RES.resMessage(res, erro, 500);
                     })
             } else {
-                return RES.responseNoPermition(res, "No permition to get all Post from other user.");
+                return RES.responseNoPermission(res, "No permission to get all Post from other user.");
             }
         })
         .catch(error => {
@@ -73,23 +75,31 @@ router.get('/:profileId', function(req, res, next) {
 });
 
 //create a post
-router.post('/', function(req, res, next) {
+router.post('/', tokerMiddleware, function(req, res, next) {
     const user_data = req.userData;
     const content = req.body.content;
     const attached = req.body.attached;
     if (content || attached) {
         const post = {};
-        post.author_id = user_data.userId;
         if (content) {
             post.content = content;
         }
         if (attached) {
             post.attached = attached;
         }
-        const newPost = new Post(post);
-        newPost.save()
-            .then(result => {
-                return RES.responseNormal(res, result, "Post was Created.");
+
+        Profile.findOne({ userId: user_data.userId })
+            .exec()
+            .then(profile => {
+                post.author_id = profile._id;
+                const newPost = new Post(post);
+                newPost.save()
+                    .then(result => {
+                        return RES.responseNormal(res, result, "Post was Created.");
+                    })
+                    .catch(error => {
+                        return RES.resMessage(res, error, 500);
+                    })
             })
             .catch(error => {
                 return RES.resMessage(res, error, 500);
@@ -97,11 +107,10 @@ router.post('/', function(req, res, next) {
     } else {
         return RES.responseNormal(res, null, "Post create invalid.");
     }
-    const post = new Post({ content: form.content, attached: form.attached })
 });
 
 //update post
-router.patch('/:postId', function(req, res, next) {
+router.patch('/:postId', tokerMiddleware, function(req, res, next) {
     const postId = req.params.postId;
     const user_data = req.userData;
     const content = req.body.content;
@@ -110,20 +119,22 @@ router.patch('/:postId', function(req, res, next) {
     Profile.findOne({ userId: user_data.userId })
         .exec()
         .then(profile => {
-            let updatePost = {};
-            if (content) {
-                updatePost.content = content;
-            }
-            if (attached) {
-                updatePost.attached = attached;
-            }
-            Post.deleteOne({ _id: postId })
+            Post.findOne({ _id: postId })
                 .exec()
                 .then(post => {
-                    if (post) {
-                        if (profile._id == post.author_id) {
-                            Post.updateOne({ _id: postId }, { $set: updatePost })
-                                .exec()
+                    console.log("Profile id: " + profile.id + " Post author: " + post.author_id);
+                    if (profile._id + "" == post.author_id) {
+                        let flag = false;
+                        if (content) {
+                            post.content = content;
+                            flag = true;
+                        }
+                        if (attached) {
+                            post.attached = attached;
+                            flag = true
+                        }
+                        if (flag) {
+                            post.save()
                                 .then(result => {
                                     return RES.responseNormal(res, result, "Post was updated.");
                                 })
@@ -131,10 +142,11 @@ router.patch('/:postId', function(req, res, next) {
                                     return RES.resMessage(res, err, 500);
                                 })
                         } else {
-                            return RES.responseNoPermition(res, "No permition to update other user's post.");
+                            return RES.responseNormal(res, result, "Post was updated.");
                         }
+
                     } else {
-                        return RES.resMessage(res, null, 500);
+                        return RES.responseNoPermission(res, "No permission to update other user's post.");
                     }
                 })
                 .catch(erro => {
@@ -147,30 +159,27 @@ router.patch('/:postId', function(req, res, next) {
 });
 
 //delete post
-router.delete('/:postId', function(req, res, next) {
+router.delete('/:postId', tokerMiddleware, function(req, res, next) {
     const user_data = req.userData;
     const postId = req.params.postId;
     Profile.findOne({ userId: user_data.userId })
         .exec()
         .then(profile => {
-            Post.deleteOne({ _id: postId })
+            Post.findOne({ _id: postId })
                 .exec()
                 .then(post => {
-                    if (post) {
-                        if (profile._id == post.author_id) {
-                            Post.deleteOne({ _id: postId })
-                                .exec()
-                                .then(result => {
-                                    return RES.responseNormal(res, result, "Post was deleted.");
-                                })
-                                .catch(err => {
-                                    return RES.resMessage(res, err, 500);
-                                })
-                        } else {
-                            return RES.responseNoPermition(res, "No permition to delete other user's post.");
-                        }
+                    if (profile._id + "" == post.author_id) {
+                        Post.deleteOne({ _id: postId })
+                            .exec()
+                            .then(result => {
+                                return RES.responseNormal(res, result, "Post was deleted.");
+                            })
+                            .catch(erro => {
+                                console.log(erro);
+                                return RES.resMessage(res, erro, 500);
+                            })
                     } else {
-                        return RES.resMessage(res, null, 500);
+                        return RES.responseNoPermission(res, "Have no permission to delele orther people's post.");
                     }
                 })
                 .catch(erro => {

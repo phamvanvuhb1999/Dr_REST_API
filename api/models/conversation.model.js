@@ -2,15 +2,15 @@ const mongoose = require('mongoose')
 const ConversationSchema = mongoose.Schema({
     author_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'Profile',
         require: true
     },
     creat_at: { type: Date, default: Date.now },
     name: { type: String, require: true },
-    nember_ids: {
+    member_ids: {
         type: [{
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
+            ref: 'Profile',
         }],
         require: true,
         validate: [

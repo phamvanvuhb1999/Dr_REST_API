@@ -9,7 +9,7 @@ const Profile = require('../models/profile.model');
 const Conversation = require('../models/conversation.model');
 
 const tokenMiddleware = require('../middlewares/check.token');
-const permitionMiddleware = require('../middlewares/check.permition.admin');
+const permissionMiddleware = require('../middlewares/check.permission.admin');
 
 const RES = require('./response');
 
@@ -39,7 +39,7 @@ router.get('/:profileId', tokenMiddleware, function(req, res, next) {
                             return RES.resMessage(res, erro, 500);
                         })
                 } else {
-                    return RES.responseNoPermition(res, "Have No permition to get other user's comment.")
+                    return RES.responseNopermission(res, "Have No permission to get other user's comment.")
                 }
             } else {
                 return RES.resMessage(res, error, 500);
@@ -194,7 +194,7 @@ router.patch('/:commentId', tokenMiddleware, function(req, res, next) {
                             return RES.resMessage(res, erro, 500);
                         })
                 } else {
-                    return RES.responseNoPermition(res, "Not the commit's author");
+                    return RES.responseNopermission(res, "Not the commit's author");
                 }
             } else {
                 return RES.responseDataEmpty(res, "No comment with Id.");
@@ -223,7 +223,7 @@ router.delete('/:commentId', tokenMiddleware, function(req, res, next) {
                             return RES.resMessage(res, erro, 500);
                         })
                 } else {
-                    return RES.responseNoPermition(res, "Not the comment's author");
+                    return RES.responseNopermission(res, "Not the comment's author");
                 }
             } else {
                 return RES.responseDataEmpty(res, "No comment with Id.");

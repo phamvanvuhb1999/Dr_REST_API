@@ -15,6 +15,11 @@ const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
 const userRoutes = require('./api/routes/users')
 
+const commentRoutes = require('./api/routes/comments');
+const conversationRoutes = require('./api/routes/conversations');
+const postRoutes = require('./api/routes/posts');
+const profileRoutes = require('./api/routes/profiles');
+
 const error_handler = require('./error_handlers');
 
 app.use(morgan('dev'));
@@ -41,6 +46,10 @@ app.use('/productImages', express.static('uploads/productImages'));
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
 app.use('/users', userRoutes);
+app.use('/comments', commentRoutes);
+app.use('/conversations', conversationRoutes);
+app.use('/posts', postRoutes);
+app.use('/profiles', profileRoutes);
 app.use('/', (req, res, next) => {
     res.status(200).json({
         message: "API Server is working."

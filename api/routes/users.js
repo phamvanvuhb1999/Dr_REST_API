@@ -4,7 +4,7 @@ const router = express.Router();
 const userController = require('../controllers/controller.users');
 
 const tokenMiddleware = require('../middlewares/check.token');
-const permitionMiddleware = require('../middlewares/check.permition.admin');
+const permissionMiddleware = require('../middlewares/check.permission.admin');
 
 
 router.post('/signup', userController.signup);
@@ -12,16 +12,16 @@ router.post('/signup', userController.signup);
 router.post('/login', userController.login);
 
 //get all users
-router.get('/', tokenMiddleware, permitionMiddleware, userController.getAllUser);
+router.get('/', tokenMiddleware, permissionMiddleware, userController.getAllUser);
 
 //get single user
-router.get('/:userId', tokenMiddleware, permitionMiddleware, userController.getUserDetail);
+router.get('/:userId', tokenMiddleware, permissionMiddleware, userController.getUserDetail);
 
 //udpate user
-router.patch('/:userId', tokenMiddleware, permitionMiddleware, userController.updateUser);
+router.patch('/:userId', tokenMiddleware, permissionMiddleware, userController.updateUser);
 
 //delete user
-router.delete('/:userId', tokenMiddleware, permitionMiddleware, userController.deleteUser);
+router.delete('/:userId', tokenMiddleware, permissionMiddleware, userController.deleteUser);
 
 
 
