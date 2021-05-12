@@ -16,6 +16,8 @@ const uri = process.env.MONGO_URI || "mongodb://localhost/express-demo";
 const connect = async function() {
     await mongoose.connect(uri, { useNewUrlParser: true }, { useUnifiedTopology: true }, { useFindAndModify: false }).catch(error => {
         console.log(error);
+    }).then(result => {
+        next()
     }).catch(error => {
 
     })
