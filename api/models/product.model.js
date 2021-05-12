@@ -12,7 +12,9 @@ const productSchema = mongoose.Schema({
 
 const product = mongoose.model('Product', productSchema);
 const connect = async function() {
-    await product.createCollection();
+    await product.createCollection().catch(error => {
+        console.log(error);
+    })
 }
 connect()
 module.exports = product;

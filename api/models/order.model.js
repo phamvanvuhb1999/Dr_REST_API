@@ -10,7 +10,9 @@ const orderSchema = mongoose.Schema({
 
 const Order = mongoose.model('Order', orderSchema);
 const connect = async function() {
-    await Order.createCollection();
+    await Order.createCollection().catch(error => {
+        console.log(error);
+    })
 }
 connect()
 module.exports = Order;

@@ -33,7 +33,9 @@ function minMembers(value) {
 
 const Conversation = mongoose.model('Conversation', ConversationSchema);
 const connect = async function() {
-    await Conversation.createCollection();
+    await Conversation.createCollection().catch(error => {
+        console.log(error);
+    })
 }
 connect()
 module.exports = Conversation;
