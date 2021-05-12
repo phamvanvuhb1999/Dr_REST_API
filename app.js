@@ -9,10 +9,17 @@ const mongoose = require('mongoose');
 ///////////////////////////////
 
 const uri = process.env.MONGO_URL || "mongodb://localhost/express-demo";
+const MongoClient = require('mongodb').MongoClient;
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+client.connect(err => {
+    const collection = client.db("test").collection("devices");
+    // perform actions on the collection object
+    client.close();
+});
 
 //////////////////////////////
 //connect to mongodb
-mongoose.connect(uri, { useNewUrlParser: true }, { useUnifiedTopology: true }, { useFindAndModify: false });
+// mongoose.connect(uri, { useNewUrlParser: true }, { useUnifiedTopology: true }, { useFindAndModify: false });
 
 //mongoose.Promise = global.Promise;
 
