@@ -42,6 +42,7 @@ app.use((req, res, next) => {
 })
 
 app.use('/productImages', express.static('uploads/productImages'));
+app.use('/comments', express.static('uploads/comments'));
 
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);

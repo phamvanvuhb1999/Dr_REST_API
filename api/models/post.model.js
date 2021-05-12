@@ -11,13 +11,11 @@ const postSchema = mongoose.Schema({
         type: String,
         require: false
     },
-    comment_ids: {
-        type: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Comment'
-        }],
-        default: []
-    },
+    conversation_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Conversation',
+        require: true,
+    }
 })
 
 

@@ -91,14 +91,19 @@ module.exports.deleteUser = (req, res, next) => {
 
 module.exports.updateUser = (req, res, next) => {
     let id = req.params.userId;
+    let password = req.body.password;
+    let email = req.body.password;
 
     User.find({ _id: id })
         .exec()
         .then(result => {
             if (result.length > 0) {
-                let updateuser = {
-                    name: req.body.newName || result.name,
-                    price: req.body.price || result.price,
+                let updateuser = {};
+                if (password && password.trim() != "") {
+                    updateuser.password = password;
+                }
+                if (email && validateEmail(email.trim())) {
+                    updateuser.email = email.trim();
                 }
                 User.updateOne({ _id: id }, { $set: updateuser })
                     .exec()
@@ -241,4 +246,9 @@ module.exports.login = (req, res, next) => {
                 message: err
             })
         })
+}
+
+function validateEmail(email) {
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
 }

@@ -7,6 +7,7 @@ const ConversationSchema = mongoose.Schema({
     },
     creat_at: { type: Date, default: Date.now },
     name: { type: String, require: true },
+    in_post: { type: Boolean, default: false },
     member_ids: {
         type: [{
             type: mongoose.Schema.Types.ObjectId,
@@ -16,7 +17,10 @@ const ConversationSchema = mongoose.Schema({
         validate: [
             minMembers, "{PATH} at least one in the conversation"
         ],
-    }
+    },
+    valid_dates: [
+        { type: mongoose.Schema.Types.Date, default: null },
+    ]
 })
 
 

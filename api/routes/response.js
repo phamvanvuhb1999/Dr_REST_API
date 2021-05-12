@@ -25,3 +25,35 @@ module.exports.responseNoPermission = function(res, message) {
         message: message
     })
 }
+
+module.exports.getUpload = function(path, limitFileSize, filetypes = '') {
+    const multer = require('multer');
+
+    const storage = multer.diskStorage({
+        destination: function(req, file, cb) {
+            cb(null, './' + path);
+        },
+        filename: function(req, file, cb) {
+            let newFileName = new Date().toISOString().replace(':', '-');
+            newFileName += file.originalname;
+            newFileName = newFileName.replace(':', '-');
+            cb(null, newFileName);
+        }
+    });
+
+    const fileFilter = (req, file, cb) => {
+        let test = filetypes.test(file.mimetype);
+        if (filetypes.toString().trim() == "" || test) {
+            cb(null, true);
+        }
+        cb(null, false);
+    }
+
+    return upload = multer({
+        storage: storage,
+        limits: {
+            fileSize: 1024 * 1024 * parseInt(limitFileSize)
+        },
+        fileFilter: fileFilter
+    });
+}
