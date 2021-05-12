@@ -2,6 +2,10 @@
     "name": "d_rest_apt",
     "version": "1.0.0",
     "description": "Rest API for comumication website",
+    "engines": {
+        "node": "12.x",
+        "npm": "7.x"
+    },
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
