@@ -6,8 +6,13 @@ const app = express();
 
 const mongoose = require('mongoose');
 
+///////////////////////////////
+
+const uri = process.env.MONGO_URL || "mongodb://localhost/express-demo";
+
+//////////////////////////////
 //connect to mongodb
-mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true }, { useUnifiedTopology: true }, { useFindAndModify: false });
+mongoose.connect(uri, { useNewUrlParser: true }, { useUnifiedTopology: true }, { useFindAndModify: false });
 
 //mongoose.Promise = global.Promise;
 
