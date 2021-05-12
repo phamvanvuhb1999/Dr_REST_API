@@ -13,8 +13,14 @@ const CommentSchema = mongoose.Schema({
     },
     content: { type: String, default: " " },
     attached: { type: String, require: true },
+    bufferCommands: false,
+    autoCreate: false
 })
 
 
 const Comment = mongoose.model('Comment', CommentSchema);
+const connect = async function() {
+    await Comment.createCollection();
+}
+connect()
 module.exports = Comment;

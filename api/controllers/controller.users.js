@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const shortid = require('shortid');
 const jwt = require('jsonwebtoken');
 const Profile = require('../models/profile.model');
+const { connect } = require('../routes/products');
 
 
 module.exports.getAllUser = (req, res, next) => {

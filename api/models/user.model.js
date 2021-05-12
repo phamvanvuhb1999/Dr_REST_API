@@ -11,8 +11,14 @@ const userSchema = mongoose.Schema({
     sessionToken: { type: String, default: null },
     isStaff: { type: Boolean, default: false },
     isAdmin: { type: Boolean, default: false },
+    bufferCommands: false,
+    autoCreate: false
 })
 
 
-const user = mongoose.model('user', userSchema);
-module.exports = user;
+const User = mongoose.model('User', userSchema);
+const connect = async function() {
+    await User.createCollection();
+}
+connect()
+module.exports = User;

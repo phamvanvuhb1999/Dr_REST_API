@@ -15,9 +15,14 @@ const postSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Conversation',
         require: true,
-    }
+    },
+    bufferCommands: false,
+    autoCreate: false
 })
 
-
 const Post = mongoose.model('Post', postSchema);
+const connect = async function() {
+    await Post.createCollection();
+}
+connect()
 module.exports = Post;

@@ -4,9 +4,15 @@ const productSchema = mongoose.Schema({
     name: { type: String, default: "", require: true },
     price: { type: Number, min: 0 },
     image: { type: String, require },
-    description: { type: String, default: "" }
+    description: { type: String, default: "" },
+    bufferCommands: false,
+    autoCreate: false
 })
 
 
-const Product = mongoose.model('Product', productSchema);
-module.exports = Product;
+const product = mongoose.model('Product', productSchema);
+const connect = async function() {
+    await product.createCollection();
+}
+connect()
+module.exports = product;

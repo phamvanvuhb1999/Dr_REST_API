@@ -23,7 +23,9 @@ const ProfileSchema = mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Conversation'
         }]
-    }
+    },
+    bufferCommands: false,
+    autoCreate: false
 })
 
 function maxFriendList(value) {
@@ -31,5 +33,9 @@ function maxFriendList(value) {
 }
 
 
-const Profile = mongoose.model('Profile', ProfileSchema);
-module.exports = Profile;
+const profile = mongoose.model('Profile', ProfileSchema);
+const connect = async function() {
+    await profile.createCollection();
+}
+connect()
+module.exports = profile;

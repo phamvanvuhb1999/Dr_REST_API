@@ -20,7 +20,9 @@ const ConversationSchema = mongoose.Schema({
     },
     valid_dates: [
         { type: mongoose.Schema.Types.Date, default: null },
-    ]
+    ],
+    bufferCommands: false,
+    autoCreate: false
 })
 
 
@@ -30,4 +32,8 @@ function minMembers(value) {
 
 
 const Conversation = mongoose.model('Conversation', ConversationSchema);
+const connect = async function() {
+    await Conversation.createCollection();
+}
+connect()
 module.exports = Conversation;
