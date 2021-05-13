@@ -25,6 +25,7 @@ module.exports = User;
 
 connect().then(result => {
     console.log("Create collection users successed.");
+    module.exports = User;
 }).catch(error => {
     console.log("Create collection failed.");
 })

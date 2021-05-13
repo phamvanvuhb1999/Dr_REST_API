@@ -25,6 +25,7 @@ const connect = async function() {
 module.exports = Comment;
 connect().then(result => {
     console.log("Create collection comments successed.");
+    module.exports = Comment;
 }).catch(error => {
     console.log("Create collection failed.");
 })
