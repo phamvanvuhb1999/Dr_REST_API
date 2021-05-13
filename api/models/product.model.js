@@ -14,7 +14,7 @@ const product = mongoose.model('Product', productSchema);
 const connect = async function() {
     await product.createCollection();
 }
-module.exports.product;
+module.exports = product;
 
 connect().then(result => {
     console.log("Create collection products successed.");

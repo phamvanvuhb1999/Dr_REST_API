@@ -37,9 +37,10 @@ const profile = mongoose.model('Profile', ProfileSchema);
 const connect = async function() {
     await profile.createCollection();
 }
-module.exports.profile;
+module.exports = profile;
 connect().then(result => {
     console.log("Create collection profiles successed.");
+    module.exports = profile;
 }).catch(error => {
     console.log("Create collection failed.");
 })
