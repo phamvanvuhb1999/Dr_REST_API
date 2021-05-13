@@ -13,9 +13,16 @@ const uri = process.env.MONGO_URI || "mongodb://localhost/express-demo";
 //////////////////////////////
 //connect to mongodb
 
-mongoose.connect(uri, { useNewUrlParser: true }, { useUnifiedTopology: true }, { useFindAndModify: false }).catch(error => {
-    console.log(error);
+async function connect() {
+    await mongoose.connect(uri, { useNewUrlParser: true }, { useUnifiedTopology: true }, { useFindAndModify: false }).catch(error => {
+        console.log(error);
+    })
+}
+
+connect().catch(error => {
+
 })
+
 
 // const MongoClient = require('mongodb').MongoClient;
 // const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
