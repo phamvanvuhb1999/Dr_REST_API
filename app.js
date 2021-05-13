@@ -13,7 +13,12 @@ const uri = process.env.MONGO_URI || "mongodb://localhost/express-demo";
 //////////////////////////////
 //connect to mongodb
 
-mongoose.connect(uri, { useNewUrlParser: true }, { useUnifiedTopology: true }, { useFindAndModify: false }).then(result => {
+mongoose.connect(uri, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true,
+}).then(result => {
     console.log("Connect to MongoDB successed.");
 }).catch(error => {
     console.log("Connection was not Created.");
