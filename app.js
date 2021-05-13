@@ -22,6 +22,7 @@ mongoose.connect(uri, {
     console.log("Connect to MongoDB successed.");
 }).catch(error => {
     console.log("Connection was not Created.");
+    console.log(error);
 })
 
 //mongoose.Promise = global.Promise;
