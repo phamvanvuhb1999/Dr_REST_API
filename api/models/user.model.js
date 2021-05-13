@@ -18,9 +18,13 @@ const userSchema = mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 const connect = async function() {
-    await User.createCollection().catch(error => {
-        console.log(error);
-    })
+    await User.createCollection();
 }
-connect()
+
 module.exports = User;
+
+connect().then(result => {
+    console.log("Create collection users successed.");
+}).catch(error => {
+    console.log("Create collection failed.");
+})

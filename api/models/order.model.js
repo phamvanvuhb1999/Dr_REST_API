@@ -10,9 +10,11 @@ const orderSchema = mongoose.Schema({
 
 const Order = mongoose.model('Order', orderSchema);
 const connect = async function() {
-    await Order.createCollection().catch(error => {
-        console.log(error);
-    })
+    await Order.createCollection();
 }
-connect()
 module.exports = Order;
+connect().then(result => {
+    console.log("Create collection orders successed.");
+}).catch(error => {
+    console.log("Create collection failed.");
+})

@@ -20,9 +20,11 @@ const CommentSchema = mongoose.Schema({
 
 const Comment = mongoose.model('Comment', CommentSchema);
 const connect = async function() {
-    await Comment.createCollection().catch(error => {
-        console.log(error);
-    })
+    await Comment.createCollection();
 }
-connect()
 module.exports = Comment;
+connect().then(result => {
+    console.log("Create collection comments successed.");
+}).catch(error => {
+    console.log("Create collection failed.");
+})

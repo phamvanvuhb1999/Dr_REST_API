@@ -35,9 +35,11 @@ function maxFriendList(value) {
 
 const profile = mongoose.model('Profile', ProfileSchema);
 const connect = async function() {
-    await profile.createCollection().catch(error => {
-        console.log(error);
-    })
+    await profile.createCollection();
 }
-connect()
-module.exports = profile;
+module.exports.profile;
+connect().then(result => {
+    console.log("Create collection profiles successed.");
+}).catch(error => {
+    console.log("Create collection failed.");
+})

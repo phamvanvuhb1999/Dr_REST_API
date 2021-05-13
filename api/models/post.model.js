@@ -22,9 +22,11 @@ const postSchema = mongoose.Schema({
 
 const Post = mongoose.model('Post', postSchema);
 const connect = async function() {
-    await Post.createCollection().catch(error => {
-        console.log(error);
-    })
+    await Post.createCollection();
 }
-connect()
 module.exports = Post;
+connect().then(result => {
+    console.log("Create collection posts successed.");
+}).catch(error => {
+    console.log("Create collection failed.");
+})
