@@ -83,7 +83,7 @@ app.use('/posts', postRoutes);
 app.use('/profiles', profileRoutes);
 app.use('/', (req, res, next) => {
     res.status(200).json({
-        message: "API Server is working."
+        message: "Có cl API ấy, tin người vcl."
     })
 })
 
