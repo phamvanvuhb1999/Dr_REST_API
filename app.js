@@ -21,8 +21,22 @@ mongoose.connect(uri, {
 }).then(result => {
     console.log("Connect to MongoDB successed.");
 }).catch(error => {
-    console.log("Connection was not Created.");
     console.log(error);
+    console.log("Connection to Cloud MongoDB was not Created.");
+    console.log("Try connect to LocalDB.");
+    mongoose.connect("mongodb://localhost/express-demo", {
+            useNewUrlParser: true,
+            useCreateIndex: true,
+            useFindAndModify: false,
+            useUnifiedTopology: true,
+        })
+        .then(result => {
+            console.log("Connected to LocalDB.");
+        })
+        .catch(error1 => {
+            console.log("Can not connect to DB.");
+            console.log(error1);
+        })
 })
 
 //mongoose.Promise = global.Promise;

@@ -15,10 +15,10 @@ router.post('/login', userController.login);
 router.get('/', tokenMiddleware, permissionMiddleware, userController.getAllUser);
 
 //get single user
-router.get('/:userId', tokenMiddleware, permissionMiddleware, userController.getUserDetail);
+router.get('/:userId', tokenMiddleware, userController.getUserDetail);
 
 //udpate user
-router.patch('/:userId', tokenMiddleware, permissionMiddleware, userController.updateUser);
+router.patch('/:userId', tokenMiddleware, userController.updateUser);
 
 //delete user
 router.delete('/:userId', tokenMiddleware, permissionMiddleware, userController.deleteUser);

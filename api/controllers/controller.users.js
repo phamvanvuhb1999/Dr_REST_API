@@ -4,7 +4,6 @@ const bcrypt = require('bcryptjs');
 const shortid = require('shortid');
 const jwt = require('jsonwebtoken');
 const Profile = require('../models/profile.model');
-const { connect } = require('../routes/products');
 
 
 module.exports.getAllUser = (req, res, next) => {
@@ -33,19 +32,19 @@ module.exports.getAllUser = (req, res, next) => {
 }
 
 module.exports.getUserDetail = (req, res, next) => {
+    let user_data = req.userData;
     let id = req.params.userId;
-    User.find({ _id: id })
+    User.findOne({ _id: id })
         .exec()
         .then(result => {
-            if (result.length > 0) {
+            if (result._id + "" == user_data.userId) {
                 res.status(200).json({
                     message: "user detail",
                     user: result
                 })
             } else {
-                res.status(200).json({
-                    message: "user detail",
-                    user: "no have user with input Id"
+                res.status(404).json({
+                    message: "Have no permission to get orther user's information.",
                 })
             }
         })
@@ -59,33 +58,16 @@ module.exports.getUserDetail = (req, res, next) => {
 
 module.exports.deleteUser = (req, res, next) => {
     let id = req.params.userId;
-    User.find({ _id: id })
+    User.remove({ _id: id })
         .exec()
-        .then(result => {
-            if (result.length > 0) {
-                User.remove({ _id: id })
-                    .exec()
-                    .then(result1 => {
-                        res.status(200).json(result1)
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        res.status(500).json({
-                            error: err
-                        });
-                    })
-            } else {
-                res.status(205).json({
-                    message: "No user Deleted.",
-                    error: 'NO user with in put ID.'
-                })
-            }
+        .then(result1 => {
+            res.status(200).json(result1)
         })
-        .catch(error => {
-            console.log(error);
+        .catch(err => {
+            console.log(err)
             res.status(500).json({
-                error: error
-            })
+                error: err
+            });
         })
 }
 
