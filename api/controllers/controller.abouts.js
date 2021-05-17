@@ -14,7 +14,7 @@ module.exports.comments = function(req, res, next) {
 module.exports.posts = function(req, res, next) {
     res.status(200).json({
         "get all posts": { "url": "/", "method": "GET", "permission": "admin" },
-        "get all posts from specific user": { "url": "/:profileId", "method": "GET", "permission": "self || admin" },
+        "get all posts from specific user": { "url": "profileId/:profileId", "method": "GET", "permission": "self || admin" },
         "get single post": { "url": "/:postId", "method": "GET", "permission": "in group" },
         "create post": { "url": "/", "method": "POST", "permission": "self", "body": "content || attached" },
         "update post": { "url": "/:postId", "method": "PATCH", "permission": "in group", "body": "content || attached" },

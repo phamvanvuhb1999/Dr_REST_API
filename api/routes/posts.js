@@ -21,7 +21,7 @@ router.get('/', tokerMiddleware, adminPermission, postController.getAll);
 router.get('/:postId', tokerMiddleware, postController.getSingle);
 
 //get all post from specific user
-router.get('/:profileId', tokerMiddleware, postController.getWithProfile);
+router.get('profileId/:profileId', tokerMiddleware, postController.getWithProfile);
 
 //create a post
 router.post('/', upload.single('attached'), tokerMiddleware, postController.create);
