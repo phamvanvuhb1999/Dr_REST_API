@@ -83,7 +83,7 @@ app.use('/posts', postRoutes);
 app.use('/profiles', profileRoutes);
 app.use('/', (req, res, next) => {
     res.status(200).json({
-        message: "Có cl API ấy, tin người vcl."
+        message: "API for webapp, have 7 routes: comments, conversations, orders, posts, products, profiles, users."
     })
 })
 

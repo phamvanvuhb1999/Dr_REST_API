@@ -7,6 +7,8 @@ const mongoose = require('mongoose');
 const shortId = require('shortid');
 
 const RES = require('../routes/response');
+const drive = require('./controller.drive');
+
 
 module.exports.getAll = function(req, res, next) {
 
@@ -52,14 +54,28 @@ module.exports.getWithProfile = function(req, res, next) {
         })
 }
 
-module.exports.create = function(req, res, next) {
+module.exports.create = async function(req, res, next) {
+    // {
+    //     fieldname: 'attached',
+    //     originalname: 'Screenshot 2021-04-13 164144.png',
+    //     encoding: '7bit',
+    //     mimetype: 'image/png',
+    //     destination: './uploads/posts',
+    //     filename: '2021-05-31T07-39-54.352ZScreenshot 2021-04-13 164144.png',
+    //     path: 'uploads\\posts\\2021-05-31T07-39-54.352ZScreenshot 2021-04-13 164144.png',
+    //     size: 45210
+    //   }
     const user_data = req.userData;
     const content = req.body.content;
-    const attached = "";
-    if (req.attached) {
-        attached = req.attached;
+    let attached = null;
+    if (req.body.attached && typeof req.body.attached === 'string') {
+        attached = req.body.attached;
     } else if (req.file) {
-        attached = req.file.path;
+        try {
+            attached = await drive.uploadAndGetLink(req.file.path);
+        } catch (err) {
+            console.log(err);
+        }
     }
     if (content || attached) {
         const post = {};
@@ -109,17 +125,22 @@ module.exports.create = function(req, res, next) {
     } else {
         return RES.responseNormal(res, null, "Post create invalid.");
     }
+
 }
 
-module.exports.update = function(req, res, next) {
+module.exports.update = async function(req, res, next) {
     const postId = req.params.postId;
     const user_data = req.userData;
     const content = req.body.content;
-    const attached = "";
-    if (req.attached) {
+    let attached = null;
+    if (req.body.attached && typeof req.body.attached === 'string') {
         attached = req.body.attached;
     } else if (req.file) {
-        attached = req.file.path;
+        try {
+            attached = await drive.uploadAndGetLink(req.file.path);
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     Profile.findOne({ userId: user_data.userId })

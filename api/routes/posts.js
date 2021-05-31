@@ -9,7 +9,7 @@ const about = require('../controllers/controller.abouts');
 
 const RES = require('./response');
 
-const upload = RES.getUpload("uploads/posts", 20);
+const upload = RES.getUpload("uploads/posts", 20, /jpeg|png|jpg/);
 
 //about
 router.get('/about', about.posts);
