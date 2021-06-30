@@ -15,7 +15,7 @@ const upload = RES.getUpload("uploads/posts", 20, /jpeg|png|jpg/);
 router.get('/about', about.posts);
 
 //get all posts
-router.get('/', tokerMiddleware, adminPermission, postController.getAll);
+router.get('/', postController.getAll);
 
 //get single post
 router.get('/:postId', tokerMiddleware, postController.getSingle);
