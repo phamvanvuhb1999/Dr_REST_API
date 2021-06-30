@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+const cors = require('cors');
 
 const app = express();
 
@@ -8,7 +9,7 @@ const mongoose = require('mongoose');
 
 ///////////////////////////////
 
-const uri = process.env.MONGO_URI || "mongodb://localhost/express-demo";
+const uri = "mongodb://localhost/express-demo" || process.env.MONGO_URI;
 
 //////////////////////////////
 //connect to mongodb
@@ -58,18 +59,21 @@ app.use(bodyParser.json());
 
 
 //Enable Cross-Origin Resource Sharing for other brower can access REST APT
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers',
-        'Origin', 'X-Requested-With, Content-Type, Accept, Authorization'
-    );
+app.use(cors());
+app.options('*', cors());
 
-    if (req.method == "OPTIONS") {
-        res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
-        return res.status(200).json({});
-    }
-    next();
-})
+// app.use((req, res, next) => {
+//     res.header('Access-Control-Allow-Origin', '*');
+//     res.header('Access-Control-Allow-Headers',
+//         'Origin', 'X-Requested-With, Content-Type, Accept, Authorization'
+//     );
+
+//     if (req.method == "OPTIONS") {
+//         res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
+//         return res.status(200).json({});
+//     }
+//     next();
+// });
 
 app.use('/productImages', express.static('uploads/productImages'));
 app.use('/comments', express.static('uploads/comments'));
