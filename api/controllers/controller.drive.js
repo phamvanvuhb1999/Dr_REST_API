@@ -38,13 +38,18 @@ module.exports.uploadFile = async function uploadFile(filePath) {
             media: {
                 mimeType: `image/${extention}`,
                 body: fs.createReadStream(filePath)
-            }
+            },
+            access_type: 'offline'
         })
+
+        fs.unlink(filePath, (result) => {
+
+        });
 
         //{kink, id, name, mimetype}
         return response.data.id;
     } catch (err) {
-        console.log(err);
+        console.log("error::", err);
     }
 }
 
@@ -74,7 +79,14 @@ module.exports.generatePublicUrl = async function generatePublicUrl(fileId) {
             fields: 'webViewLink, webContentLink',
         });
         //{webviewlink, webcontentlink}
-        return result.data.webViewLink;
+        function clearLink(link) {
+            //https://drive.google.com/file/d/18Rs9hG2JIFhM5D70KsDdG74_LLsXkhlL/view?usp=sharing
+            let result = link.replace("file/d/", "uc?id=");
+            result = result.replace('/view?usp=sharing', '');
+            result = result.replace('/view?usp=drivesdk', '');
+            return result;
+        }
+        return clearLink(result.data.webViewLink);
     } catch (err) {
         console.log(err);
         return null;

@@ -179,46 +179,68 @@ module.exports.signup = (req, res, next) => {
 }
 
 module.exports.login = (req, res, next) => {
-    User.find({ email: req.body.email })
+    User.findOne({ email: req.body.email })
         .exec()
-        .then(users => {
-            if (users.length > 0) {
-                bcrypt.compare(req.body.password, users[0].password, (err, result) => {
-                    if (err) {
-                        return res.status(401).json({
-                            message: 'Auth failed.'
-                        })
-                    }
-                    const newSessionToken = shortid.generate();
-                    if (result) {
-                        User.updateOne({ email: users[0].email }, {
-                                sessionToken: newSessionToken
-                            }).exec()
-                            .then(modidy => {
-                                const token = jwt.sign({
-                                        email: users[0].email,
-                                        userId: users[0]._id,
-                                        sessionToken: newSessionToken,
-                                    },
-                                    process.env.JWT_KEY, {
-                                        expiresIn: "4h"
-                                    },
-                                );
+        .then(user => {
+            if (user) {
+                Profile.findOne({ userId: user._id })
+                    .exec()
+                    .then(profileRaw => {
+                        function clearLink(link) {
+                            //https://drive.google.com/file/d/18Rs9hG2JIFhM5D70KsDdG74_LLsXkhlL/view?usp=sharing
+                            let result = link.replace("file/d/", "uc?id=");
+                            result = result.replace('/view?usp=sharing', '');
+                            return result;
+                        }
+                        let profile = { fullname: profileRaw.fullname, _id: profileRaw._id, avatar: clearLink(profileRaw.avatar) || "" }
+                        bcrypt.compare(req.body.password, user.password, (error1, result) => {
+                            if (error1 || !result) {
                                 return res.status(200).json({
-                                    message: 'Auth successfuly.',
-                                    token: token
+                                    message: 'Auth failed, Wrong password.',
+                                    error: error1,
+                                    profile: profile
                                 })
-                            })
-                            .catch(error => {
-                                res.status(401).json({
-                                    message: "Auth Failed."
-                                })
-                            })
+                            }
+                            const newSessionToken = shortid.generate();
+                            if (result) {
+                                User.updateOne({ email: user.email }, {
+                                        sessionToken: newSessionToken
+                                    }).exec()
+                                    .then(modidy => {
+                                        const token = jwt.sign({
+                                                email: user.email,
+                                                userId: user._id,
+                                                sessionToken: newSessionToken,
+                                                profile: profile
+                                            },
+                                            process.env.JWT_KEY, {
+                                                expiresIn: "4h"
+                                            },
+                                        );
+                                        return res.status(200).json({
+                                            message: 'Auth successfuly.',
+                                            token: token,
+                                            profile: profile
+                                        })
+                                    })
+                                    .catch(error2 => {
+                                        return res.status(401).json({
+                                            message: "Auth Failed.",
+                                            error: error2
+                                        })
+                                    })
 
-                    }
-                })
+                            }
+                        })
+                    })
+                    .catch(error3 => {
+                        return res.status(401).json({
+                            message: "Auth Failed.",
+                            error: error3
+                        })
+                    })
             } else {
-                res.status(401).json({
+                res.status(404).json({
                     message: 'Auth failed.'
                 })
             }

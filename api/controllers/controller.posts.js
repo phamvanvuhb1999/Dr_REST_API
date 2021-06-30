@@ -74,9 +74,12 @@ module.exports.create = async function(req, res, next) {
         try {
             attached = await drive.uploadAndGetLink(req.file.path);
         } catch (err) {
-            console.log(err);
+            console.log("error", err);
         }
     }
+
+    console.log(attached);
+
     if (content || attached) {
         const post = {};
         if (content) {
