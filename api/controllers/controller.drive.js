@@ -34,6 +34,7 @@ module.exports.uploadFile = async function uploadFile(filePath) {
             requestBody: {
                 name: filename,
                 mimeType: `image/${extention}`,
+                parents: [process.env.POSTS_PARENT_FOLDER_ID]
             },
             media: {
                 mimeType: `image/${extention}`,
