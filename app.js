@@ -9,7 +9,7 @@ const mongoose = require('mongoose');
 
 ///////////////////////////////
 
-const uri = "mongodb://localhost/express-demo" || process.env.MONGO_URI;
+const uri = process.env.MONGO_URI || "mongodb://localhost/express-demo";
 
 //////////////////////////////
 //connect to mongodb
