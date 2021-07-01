@@ -1,0 +1,3 @@
+Folder to save temp file before upload to drive
+
+Client ------save--->uploads-----upload to drive and clear file--->drive
