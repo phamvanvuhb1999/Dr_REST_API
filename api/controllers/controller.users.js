@@ -188,9 +188,13 @@ module.exports.login = (req, res, next) => {
                     .then(profileRaw => {
                         function clearLink(link) {
                             //https://drive.google.com/file/d/18Rs9hG2JIFhM5D70KsDdG74_LLsXkhlL/view?usp=sharing
-                            let result = link.replace("file/d/", "uc?id=");
-                            result = result.replace('/view?usp=sharing', '');
-                            return result;
+                            if (link) {
+                                let result = link.replace("file/d/", "uc?id=");
+                                result = result.replace('/view?usp=sharing', '');
+                                return result;
+                            } else {
+                                return "";
+                            }
                         }
                         let profile = { fullname: profileRaw.fullname, _id: profileRaw._id, avatar: clearLink(profileRaw.avatar) || "" }
                         bcrypt.compare(req.body.password, user.password, (error1, result) => {
@@ -225,7 +229,7 @@ module.exports.login = (req, res, next) => {
                                     })
                                     .catch(error2 => {
                                         return res.status(401).json({
-                                            message: "Auth Failed.",
+                                            message: "Auth Failed. 2",
                                             error: error2
                                         })
                                     })
@@ -235,7 +239,7 @@ module.exports.login = (req, res, next) => {
                     })
                     .catch(error3 => {
                         return res.status(401).json({
-                            message: "Auth Failed.",
+                            message: "Auth Failed. 3",
                             error: error3
                         })
                     })
